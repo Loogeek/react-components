@@ -1,12 +1,17 @@
 import type { Dayjs } from "dayjs";
 import clsx from "clsx";
 import type { CalendarProps } from ".";
+import { useContext } from "react";
+import LocaleContext from "./localeContext";
+import allLocals from "./locale";
 
 const preCls = "calendar-month";
-export interface MonthCalendarProps extends CalendarProps {}
+export interface MonthCalendarProps extends CalendarProps {
+  curMonth: Dayjs;
+  onSelectDate?: (date: Dayjs) => void;
+}
 
 function getAllDays(date: Dayjs) {
-  const daysInMonth = date.daysInMonth();
   const startDate = date.startOf("month");
   const day = startDate.day();
   const daysInfo: Array<{ date: Dayjs; currentMonth: boolean }> = new Array(
@@ -32,9 +37,20 @@ function getAllDays(date: Dayjs) {
 }
 
 function MonthCalendar(props: MonthCalendarProps) {
-  const weekList = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+  const { dateInnerContent, dateRender, value, curMonth, onSelectDate } = props;
+  const localeContext = useContext(LocaleContext);
+  const weekList = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
 
-  const allDays = getAllDays(props.value);
+  const allDays = getAllDays(curMonth);
+  const CalendarLocale = allLocals[localeContext.locale];
 
   function renderDays(days: Array<{ date: Dayjs; currentMonth: boolean }>) {
     const rows = [];
@@ -48,8 +64,26 @@ function MonthCalendar(props: MonthCalendarProps) {
             className={clsx(`${preCls}-body-cell`, {
               [`${preCls}-body-cell-current`]: item.currentMonth,
             })}
+            onClick={() => onSelectDate?.(item.date)}
           >
-            {item.date.date()}
+            {dateRender ? (
+              dateRender(item.date)
+            ) : (
+              <div className={`${preCls}-body-cell-date`}>
+                <div
+                  className={clsx(`${preCls}-cell-body-date-value`, {
+                    [`${preCls}-body-cell-date-selected`]:
+                      value.format("YYYY-MM-DD") ===
+                      item.date.format("YYYY-MM-DD"),
+                  })}
+                >
+                  {item.date.date()}
+                </div>
+                <div className={`${preCls}-cell-body-date-content`}>
+                  {dateInnerContent?.(item.date)}
+                </div>
+              </div>
+            )}
           </div>
         );
       }
@@ -64,7 +98,7 @@ function MonthCalendar(props: MonthCalendarProps) {
       <div className={`${preCls}-week-list`}>
         {weekList.map((week) => (
           <div className={`${preCls}-week-list-item`} key={week}>
-            {week}
+            {CalendarLocale.week[week]}
           </div>
         ))}
       </div>

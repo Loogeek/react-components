@@ -18,6 +18,16 @@ function App() {
     <>
       <Calendar
         value={dayjs("2024-07-28")}
+        locale="en-US"
+        // dateRender={(value) => {
+        //   return (
+        //     <div>
+        //       <p style={{ background: "yellowgreen", height: "50px" }}>
+        //         {value.format("YYYY/MM/DD")}
+        //       </p>
+        //     </div>
+        //   );
+        // }}
         // defaultValue={new Date()}
         // ref={calendarRef}
         // onChange={(date: Date) => {

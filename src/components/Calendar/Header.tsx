@@ -1,13 +1,37 @@
+import type { Dayjs } from "dayjs";
+import { useContext } from "react";
+import LocaleContext from "./localeContext";
+import allLocals from "./locale";
+
 const preCls = "calendar-header";
 
-function Header() {
+interface HeaderProps {
+  curMonth: Dayjs;
+  onChangePreMonth: () => void;
+  onChangeNextMonth: () => void;
+  onToday: () => void;
+}
+
+function Header(props: HeaderProps) {
+  const { curMonth, onChangePreMonth, onChangeNextMonth, onToday } = props;
+  const localContext = useContext(LocaleContext);
+  const CalendarContext = allLocals[localContext.locale];
+
   return (
     <div className={`${preCls}`}>
       <div className={`${preCls}-left`}>
-        <div className={`${preCls}-icon`}>&lt;</div>
-        <div className={`${preCls}-value`}>2024 年 7 月</div>
-        <div className={`${preCls}-icon`}>&gt;</div>
-        <button className={`${preCls}-btn`}>今天</button>
+        <div className={`${preCls}-icon`} onClick={onChangePreMonth}>
+          &lt;
+        </div>
+        <div className={`${preCls}-value`}>
+          {curMonth.format(CalendarContext.formatMonth)}
+        </div>
+        <div className={`${preCls}-icon`} onClick={onChangeNextMonth}>
+          &gt;
+        </div>
+        <button className={`${preCls}-btn`} onClick={onToday}>
+          {CalendarContext.today}
+        </button>
       </div>
     </div>
   );
